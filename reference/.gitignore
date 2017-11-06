@@ -3,6 +3,7 @@ db
 incremental_db
 output_files
 simulation
+hps_isw_handoff
 *.bak
 mcv_hps
 mcv_hps.sopcinfo
