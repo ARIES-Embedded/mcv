@@ -44,6 +44,7 @@ clean-git:
 
 clean:
 	$(RM) -r $(OUTPUT_DIR)
+	$(RM) -r hps_isw_handoff
 	$(RM) *~ *.rpt *.chg *.htm *.txt *.eqn *.pin *.sof *.pof *.summary
 
 .PHONY: cfg
