@@ -33,6 +33,7 @@ all: $(OUTPUT_DIR)/$(PROJECT).sof $(OUTPUT_DIR)/$(PROJECT).rbf
 
 distclean: clean clean-qsys
 	$(RM) -r db incremental_db simulation
+	$(RM) *.qws *.sopcinfo
 	$(RM) *~ *.bak
 
 clean-qsys:
