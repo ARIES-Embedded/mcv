@@ -5,7 +5,7 @@
 #
 
 PROJECT := mcv_reference
-CONFIG  := c2
+# CONFIG  := c2
 
 QSYS_FILE := mcv_hps.qsys
 
@@ -24,7 +24,8 @@ STAMP := echo done >
 RM    := rm -f
 
 QUARTUS := quartus
-Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
+#Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
+Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(PROJECT)
 
 .PHONY: all clean distclean clean-qsys
 
@@ -62,7 +63,8 @@ fit: $(OUTPUT_DIR)/$(PROJECT).fit.rpt
 asm: $(OUTPUT_DIR)/$(PROJECT).asm.rpt
 sta: $(OUTPUT_DIR)/$(PROJECT).sta.rpt
 
-MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
+#MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
+MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(PROJECT)
 FIT_ARGS := $(Q_ARGS)
 ASM_ARGS := $(Q_ARGS)
 STA_ARGS := $(PROJECT)
