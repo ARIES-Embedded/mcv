@@ -51,41 +51,41 @@ clean:
 
 .PHONY: cfg
 
-cfg: $(OUTPUT_DIR)/$(PROJECT).sof
-	$(QUARTUS)_pgm $(PROJECT)_sof.cdf
+cfg: $(OUTPUT_DIR)/$(CONFIG).sof
+	$(QUARTUS)_pgm $(CONFIG)_sof.cdf
 
-$(OUTPUT_DIR)/$(PROJECT).sof: asm
-$(OUTPUT_DIR)/$(PROJECT).rbf: asm
+$(OUTPUT_DIR)/$(CONFIG).sof: asm
+$(OUTPUT_DIR)/$(CONFIG).rbf: asm
 
 $(QSYS_QIP_FILE): $(QSYS_FILE)
 	qsys-generate --synthesis=VERILOG $<
 
 .PHONY: qsys map fit asm sta
 qsys:$(QSYS_QIP_FILE)
-map: $(OUTPUT_DIR)/$(PROJECT).map.rpt
-fit: $(OUTPUT_DIR)/$(PROJECT).fit.rpt
-asm: $(OUTPUT_DIR)/$(PROJECT).asm.rpt
-sta: $(OUTPUT_DIR)/$(PROJECT).sta.rpt
+map: $(OUTPUT_DIR)/$(CONFIG).map.rpt
+fit: $(OUTPUT_DIR)/$(CONFIG).fit.rpt
+asm: $(OUTPUT_DIR)/$(CONFIG).asm.rpt
+sta: $(OUTPUT_DIR)/$(CONFIG).sta.rpt
 
 #MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(CONFIG)
 MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(CONFIG)
 FIT_ARGS := $(Q_ARGS)
 ASM_ARGS := $(Q_ARGS)
-STA_ARGS := $(PROJECT)
+STA_ARGS := $(CONFIG)
 
-$(OUTPUT_DIR)/$(PROJECT).map.rpt: map.chg $(SOURCE_FILES) $(IP_FILES)
+$(OUTPUT_DIR)/$(CONFIG).map.rpt: map.chg $(SOURCE_FILES) $(IP_FILES)
 	$(QUARTUS)_map $(MAP_ARGS)
 	$(STAMP) fit.chg
 
-$(OUTPUT_DIR)/$(PROJECT).fit.rpt: fit.chg $(OUTPUT_DIR)/$(PROJECT).map.rpt $(PIN_ASSIGNMENTS)
+$(OUTPUT_DIR)/$(CONFIG).fit.rpt: fit.chg $(OUTPUT_DIR)/$(CONFIG).map.rpt $(PIN_ASSIGNMENTS)
 	$(QUARTUS)_fit $(FIT_ARGS)
 	$(STAMP) asm.chg
 	$(STAMP) sta.chg
 
-$(OUTPUT_DIR)/$(PROJECT).asm.rpt: asm.chg $(OUTPUT_DIR)/$(PROJECT).fit.rpt
+$(OUTPUT_DIR)/$(CONFIG).asm.rpt: asm.chg $(OUTPUT_DIR)/$(CONFIG).fit.rpt
 	$(QUARTUS)_asm $(ASM_ARGS)
 
-$(OUTPUT_DIR)/$(PROJECT).sta.rpt: sta.chg $(OUTPUT_DIR)/$(PROJECT).fit.rpt
+$(OUTPUT_DIR)/$(CONFIG).sta.rpt: sta.chg $(OUTPUT_DIR)/$(CONFIG).fit.rpt
 	$(QUARTUS)_sta $(STA_ARGS)
 
 map.chg:
