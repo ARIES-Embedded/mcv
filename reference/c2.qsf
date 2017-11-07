@@ -1,0 +1,6 @@
+#
+# Copyright (C) 2016-2017 ARIES Embedded GmbH
+#
+
+set_global_assignment -name DEVICE 5CSXFC2C6U23C7
+source mcv_reference.qsf

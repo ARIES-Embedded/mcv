@@ -5,7 +5,8 @@
 #
 
 PROJECT := mcv_reference
-# CONFIG  := c2
+CONFIG  := c2
+#CONFIG  := c6
 
 QSYS_FILE := mcv_hps.qsys
 
@@ -14,7 +15,7 @@ VERILOG_FILES := mcv_reference.v
 QSYS_SYSTEM_NAME := $(subst .qsys,,$(QSYS_FILE))
 QSYS_QIP_FILE := $(QSYS_SYSTEM_NAME)/synthesis/$(QSYS_SYSTEM_NAME).qip
 
-ASSIGNMENT_FILES := $(PROJECT).qpf $(PROJECT).qsf
+ASSIGNMENT_FILES := $(PROJECT).qpf $(widlcard *.qsf)
 
 SOURCE_FILES := $(ASSIGNMENT_FILES) $(VERILOG_FILES) $(QSYS_QIP_FILE)
 
@@ -24,8 +25,8 @@ STAMP := echo done >
 RM    := rm -f
 
 QUARTUS := quartus
-#Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
-Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(PROJECT)
+#Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(CONFIG)
+Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(CONFIG)
 
 .PHONY: all clean distclean clean-qsys
 
@@ -33,7 +34,7 @@ all: $(OUTPUT_DIR)/$(PROJECT).sof $(OUTPUT_DIR)/$(PROJECT).rbf
 
 distclean: clean clean-qsys
 	$(RM) -r db incremental_db simulation
-	$(RM) *.qws *.sopcinfo
+	$(RM) *.qws *.sopcinfo *.csv
 	$(RM) *~ *.bak
 
 clean-qsys:
@@ -46,7 +47,7 @@ clean-git:
 clean:
 	$(RM) -r $(OUTPUT_DIR)
 	$(RM) -r hps_isw_handoff
-	$(RM) *~ *.rpt *.chg *.htm *.txt *.eqn *.pin *.sof *.pof *.summary
+	$(RM) *~ *.rpt *.chg *.htm *.txt *.eqn *.pin *.sof *.pof *.rbf *.summary
 
 .PHONY: cfg
 
@@ -54,19 +55,20 @@ cfg: $(OUTPUT_DIR)/$(PROJECT).sof
 	$(QUARTUS)_pgm $(PROJECT)_sof.cdf
 
 $(OUTPUT_DIR)/$(PROJECT).sof: asm
-$(OUTPUT_DIR)/$(PROJECT).pof: asm
+$(OUTPUT_DIR)/$(PROJECT).rbf: asm
 
 $(QSYS_QIP_FILE): $(QSYS_FILE)
 	qsys-generate --synthesis=VERILOG $<
 
-.PHONY: map fit asm sta
+.PHONY: qsys map fit asm sta
+qsys:$(QSYS_QIP_FILE)
 map: $(OUTPUT_DIR)/$(PROJECT).map.rpt
 fit: $(OUTPUT_DIR)/$(PROJECT).fit.rpt
 asm: $(OUTPUT_DIR)/$(PROJECT).asm.rpt
 sta: $(OUTPUT_DIR)/$(PROJECT).sta.rpt
 
-#MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(PROJECT)_$(CONFIG)
-MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(PROJECT)
+#MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(CONFIG)
+MAP_ARGS := --read_settings_file=on --write_settings_file=off $(PROJECT) -c $(CONFIG)
 FIT_ARGS := $(Q_ARGS)
 ASM_ARGS := $(Q_ARGS)
 STA_ARGS := $(PROJECT)

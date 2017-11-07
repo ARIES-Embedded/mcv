@@ -1,6 +1,7 @@
 QUARTUS_VERSION = "17.0"
-DATE = "16:16:01  November 06, 2017"
+DATE = "10:38:51  November 07, 2017"
 
 # Revisions
 
-PROJECT_REVISION = "mcv_reference"
+PROJECT_REVISION = "c2"
+PROJECT_REVISION = "c6"
