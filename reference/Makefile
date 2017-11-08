@@ -30,7 +30,7 @@ Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(CO
 
 .PHONY: all clean distclean clean-qsys
 
-all: $(OUTPUT_DIR)/$(PROJECT).sof $(OUTPUT_DIR)/$(PROJECT).rbf
+all: $(OUTPUT_DIR)/$(CONFIG).sof $(OUTPUT_DIR)/$(CONFIG).rbf
 
 distclean: clean clean-qsys
 	$(RM) -r db incremental_db simulation
