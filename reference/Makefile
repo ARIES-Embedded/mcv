@@ -20,6 +20,9 @@ ASSIGNMENT_FILES := $(PROJECT).qpf $(widlcard *.qsf)
 SOURCE_FILES := $(ASSIGNMENT_FILES) $(VERILOG_FILES) $(QSYS_QIP_FILE)
 
 OUTPUT_DIR := ./output_files
+BSP_DIR := ./software/spl_bsp
+
+DTS_FILE := $(OUTPUT_DIR)/$(QSYS_SYSTEM_NAME).dts
 
 STAMP := echo done >
 RM    := rm -f
@@ -28,11 +31,14 @@ QUARTUS := quartus
 #Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(CONFIG)
 Q_ARGS  := --read_settings_file=off --write_settings_file=off $(PROJECT) -c $(CONFIG)
 
-.PHONY: all clean distclean clean-qsys
+QUARTUS_INSTALL_DIR := $(shell which $(QUARTUS) | sed -e 's@/quartus/bin/quartus$$@@')
+QUARTUS_EMBEDDED_TOOLS := $(QUARTUS_INSTALL_DIR)/embedded/host_tools/altera
+
+.PHONY: all bsp dts clean distclean clean-qsys clean-bsp clean-dts
 
 all: $(OUTPUT_DIR)/$(CONFIG).sof $(OUTPUT_DIR)/$(CONFIG).rbf
 
-distclean: clean clean-qsys
+distclean: clean clean-qsys clean-bsp clean-dts
 	$(RM) -r db incremental_db simulation
 	$(RM) *.qws *.sopcinfo *.csv
 	$(RM) *~ *.bak
@@ -40,6 +46,13 @@ distclean: clean clean-qsys
 clean-qsys:
 	$(RM) -r $(QSYS_SYSTEM_NAME) .qsys_edit
 	$(RM) $(QSYS_SYSTEM_NAME).{cmp,html,sopcinfo}
+
+clean-bsp:
+	$(RM) -r $(BSP_DIR)/generated
+	$(RM) $(BSP_DIR)/Makefile $(BSP_DIR)/*.ds
+
+clean-dts:
+	$(RM) $(DTS_FILE)
 
 clean-git:
 	git clean -d -f
@@ -56,6 +69,15 @@ cfg: $(OUTPUT_DIR)/$(CONFIG).sof
 
 $(OUTPUT_DIR)/$(CONFIG).sof: asm
 $(OUTPUT_DIR)/$(CONFIG).rbf: asm
+
+bsp: $(OUTPUT_DIR)/$(CONFIG).asm.rpt
+	$(QUARTUS_EMBEDDED_TOOLS)/preloadergen/bsp-generate-files \
+		--settings=$(BSP_DIR)/settings.bsp --bsp-dir=$(BSP_DIR)
+
+dts: $(DTS_FILE)
+
+$(DTS_FILE): asm $(QSYS_SYSTEM_NAME).sopcinfo
+	$(QUARTUS_EMBEDDED_TOOLS)/device_tree/sopc2dts --input=$(QSYS_SYSTEM_NAME).sopcinfo > $@
 
 $(QSYS_QIP_FILE): $(QSYS_FILE)
 	qsys-generate --synthesis=VERILOG $<
