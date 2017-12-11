@@ -8,6 +8,12 @@ PROJECT := mcv_reference
 CONFIG  := c2
 #CONFIG  := c6
 
+ifeq ($(CONFIG),c2)
+DEVICE_NAME := 5CSXFC2C6U23C7
+else
+DEVICE_NAME := 5CSXFC6C6U23C7
+endif
+
 QSYS_FILE := mcv_hps.qsys
 
 VERILOG_FILES := mcv_reference.v
@@ -44,6 +50,7 @@ distclean: clean clean-qsys clean-bsp clean-dts
 	$(RM) *~ *.bak
 
 clean-qsys:
+	$(RM) $(QSYS_FILE)
 	$(RM) -r $(QSYS_SYSTEM_NAME) .qsys_edit
 	$(RM) $(QSYS_SYSTEM_NAME).{cmp,html,sopcinfo}
 
@@ -81,6 +88,9 @@ $(DTS_FILE): asm $(QSYS_SYSTEM_NAME).sopcinfo
 
 $(QSYS_QIP_FILE): $(QSYS_FILE)
 	qsys-generate --synthesis=VERILOG $<
+
+$(QSYS_FILE): $(QSYS_FILE).in Makefile
+	sed -e 's/@DEVICE_NAME@/$(DEVICE_NAME)/' $< > $@
 
 .PHONY: qsys map fit asm sta
 qsys:$(QSYS_QIP_FILE)

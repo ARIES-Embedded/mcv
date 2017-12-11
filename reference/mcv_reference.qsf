@@ -520,12 +520,6 @@ set_location_assignment PIN_V28 -to memory_mem_reset_n
 set_location_assignment PIN_E25 -to memory_mem_we_n
 set_location_assignment PIN_D25 -to memory_oct_rzqin
 
-set_location_assignment PIN_L10 -to iob5b[0]
-set_location_assignment PIN_L9 -to iob5b[1]
-set_location_assignment PIN_L8 -to iob5b[2]
-set_location_assignment PIN_K8 -to iob5b[3]
-set_location_assignment PIN_H5 -to iob5b[4]
-set_location_assignment PIN_H6 -to iob5b[5]
 set_location_assignment PIN_E11 -to iob8a[0]
 set_location_assignment PIN_D11 -to iob8a[1]
 set_location_assignment PIN_E8 -to iob8a[2]
@@ -573,7 +567,6 @@ set_instance_assignment -name VIRTUAL_PIN ON -to hps_0_uart1_txd
 set_instance_assignment -name VIRTUAL_PIN ON -to hps_0_uart1_rxd
 set_location_assignment PIN_AD12 -to iob3b[17]
 set_location_assignment PIN_AE12 -to iob3b[16]
-set_location_assignment PIN_H4 -to nrst
 
 set_instance_assignment -name GLOBAL_SIGNAL OFF -to inst|hps_0|hps_io|border|hps_sdram_inst|p0|umemphy|ureset|phy_reset_mem_stable_n -tag __hps_sdram_p0
 set_instance_assignment -name GLOBAL_SIGNAL OFF -to inst|hps_0|hps_io|border|hps_sdram_inst|p0|umemphy|ureset|phy_reset_n -tag __hps_sdram_p0
