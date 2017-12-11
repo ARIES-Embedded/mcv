@@ -4,3 +4,12 @@
 
 set_global_assignment -name DEVICE 5CSXFC2C6U23C7
 source mcv_reference.qsf
+
+set_location_assignment PIN_L10 -to iob5b[0]
+set_location_assignment PIN_L9  -to iob5b[1]
+set_location_assignment PIN_L8  -to iob5b[2]
+set_location_assignment PIN_K8  -to iob5b[3]
+set_location_assignment PIN_H5  -to iob5b[4]
+set_location_assignment PIN_H6  -to iob5b[5]
+
+set_location_assignment PIN_H4  -to nrst
