@@ -1,9 +1,12 @@
 #
-# Copyright (C) 2016-2017 ARIES Embedded GmbH
+# Copyright (C) 2016-2019 ARIES Embedded GmbH
 #
 
 set_global_assignment -name DEVICE 5CSXFC2C6U23C7
 source mcv_reference.qsf
+
+set_location_assignment PIN_D12 -to clk50a
+set_location_assignment PIN_C12 -to clk50b
 
 set_location_assignment PIN_L10 -to iob5b[0]
 set_location_assignment PIN_L9  -to iob5b[1]
@@ -13,3 +16,21 @@ set_location_assignment PIN_H5  -to iob5b[4]
 set_location_assignment PIN_H6  -to iob5b[5]
 
 set_location_assignment PIN_H4  -to nrst
+
+set_global_assignment -name VHDL_FILE SRC/ressync.vhd
+set_global_assignment -name VHDL_FILE SRC/lcd_adapt.vhd
+set_global_assignment -name VHDL_FILE SRC/img_gen.vhd
+set_global_assignment -name VHDL_FILE SRC/fpga_appli.vhd
+set_global_assignment -name VHDL_FILE SRC/decl_lcd.vhd
+set_global_assignment -name VERILOG_FILE mcv_reference.v
+set_global_assignment -name QIP_FILE mcv_hps/synthesis/mcv_hps.qip
+set_global_assignment -name SDC_FILE mcv_reference.sdc
+set_global_assignment -name CDF_FILE mcv_reference.cdf
+set_global_assignment -name QIP_FILE IP/appli_pll.qip
+set_global_assignment -name SIP_FILE IP/appli_pll.sip
+
+set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

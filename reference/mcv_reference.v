@@ -241,12 +241,45 @@ module mcv_reference(
    inout wire [3:0]   memory_mem_dqs;
    inout wire [3:0]   memory_mem_dqs_n;
 
-   wire   sysclk;
-   assign sysclk = clk50a;
+  wire  fpga_clk;
+  wire  fpga_refclk;
+  wire  fpga_clk_rst_n;
+  assign fpga_refclk = clk50a;
+
+
+  // LCD-Display:
+  wire lcd_clk;    // LCD-CLK
+  wire lcd_disp;   // LCD-DisplayOn/Off
+  wire lcd_dim;    // LCD-DIMM/PWM
+  wire lcd_hsync;  // LCD-DIMM/hync
+  wire lcd_vsync;  // LCD-DIMM/vsync
+  wire lcd_dval;   // LCD-DIMM/dval
+  //
+  wire [7:0] lcdr;
+  wire [7:0] lcdg;
+  wire [7:0] lcdb;
+
+  wire [23:0] frmbuf_vid_dat;
+  wire frmbuf_vid_val;
+  wire frmbuf_vid_pkgstrt;
+  wire frmbuf_vid_pkgend;
+  wire vid_rdy_2frmbuf;
+
+
+  // changed in LCD reference design:
+  wire [5:0] led;
+
 
    mcv_hps b2v_inst(
-	            .clk_clk(sysclk),
-	            .reset_reset_n(nrst),
+              .clk_clk(fpga_refclk),
+              .reset_reset_n(fpga_clk_rst_n),
+
+              .alt_vip_cl_vfb_0_dout_ready(vid_rdy_2frmbuf),
+              .alt_vip_cl_vfb_0_dout_startofpacket(frmbuf_vid_pkgstrt),
+              .alt_vip_cl_vfb_0_dout_endofpacket(frmbuf_vid_pkgend),
+              .alt_vip_cl_vfb_0_dout_valid(frmbuf_vid_val),
+              .alt_vip_cl_vfb_0_dout_data(frmbuf_vid_dat),
+
 	            .hps_io_hps_io_emac0_inst_RXD0(hps_io_hps_io_emac0_inst_RXD0),
 	            .hps_io_hps_io_emac0_inst_RX_CTL(hps_io_hps_io_emac0_inst_RX_CTL),
 	            .hps_io_hps_io_emac0_inst_RX_CLK(hps_io_hps_io_emac0_inst_RX_CLK),
@@ -318,11 +351,18 @@ module mcv_reference(
 	            .memory_mem_dq(memory_mem_dq),
 	            .memory_mem_dqs(memory_mem_dqs),
 	            .memory_mem_dqs_n(memory_mem_dqs_n),
-	            .pio_iob3a_export(iob3a),
-	            .pio_iob3b_export(iob3b),
+
+				   // we changed in LCD reference design:
+               // LCD   .pio_iob3a_export(iob3a),
+               // LCD   .pio_iob3b_export(iob3b),
+               // LEDs  .pio_iob4a_0_export(iob4a[31:0]),
+               // LED-Signals:
+               //       .pio_iob4a_1_export(iob4a[63:32]),
+
 	            .pio_iob4a_0_export(iob4a[31:0]),
 	            .pio_iob4a_1_export(iob4a[63:32]),
 	            .pio_iob4a_2_export(iob4a[67:64]),
+
 	            .pio_iob5a_export(iob5a),
 	            .pio_iob5b_export(iob5b),
 	            .pio_iob8a_export(iob8a),
@@ -356,6 +396,92 @@ module mcv_reference(
 	            .memory_mem_a(memory_mem_a),
 	            .memory_mem_ba(memory_mem_ba),
 	            .memory_mem_dm(memory_mem_dm)
+
+            );
+
+
+//###########################################################################
+// fpga_application: video stream output to lcd display
+//###########################################################################
+
+   fpga_appli appli_inst(
+          .rst_n(nrst),
+          .fpga_refclk(fpga_refclk),
+          .fpga_clk_rst_n(fpga_clk_rst_n),
+          .fpga_clk(fpga_clk),
+
+          .vid_pkgstrt(frmbuf_vid_pkgstrt),
+			 .vid_pkgend(frmbuf_vid_pkgend),
+          .vid_dat(frmbuf_vid_dat),
+          .vid_val(frmbuf_vid_val),
+          .vid_rdy(vid_rdy_2frmbuf),
+
+          .lcd_clk(lcd_clk),
+          .lcd_disp(lcd_disp),
+          .lcd_dim(lcd_dim),
+          .lcd_vsync(lcd_vsync),
+          .lcd_hsync(lcd_hsync),
+          .lcd_dval(lcd_dval),
+          .lcd_red(lcdr),
+          .lcd_green(lcdg),
+          .lcd_blue(lcdb),
+
+          .led(led)
 	            );
+
+
+// LCD-Display:
+assign iob3a[7]  = lcd_clk;
+assign iob3b[26] = lcd_disp;  // LCD-DisplayOn/Off + Enable LED-BacklightDriver(1=ON)
+assign iob3b[27] = lcd_dim;   // LCD-Dimm/PWM
+
+assign iob3b[1] = lcd_vsync;
+assign iob3b[2] = lcd_hsync;
+assign iob3b[0] = lcd_dval;
+
+// LCD-Data:
+// lcdr
+assign iob3a[6]  = lcdr[0];
+assign iob3a[5]  = lcdr[1];
+assign iob3a[4]  = lcdr[2];
+assign iob3a[3]  = lcdr[3];
+assign iob3a[2]  = lcdr[4];
+assign iob3a[1]  = lcdr[5];
+assign iob3a[0]  = lcdr[6];
+assign iob3b[15] = lcdr[7];
+
+// lcdg
+assign iob3b[14] = lcdg[0];
+assign iob3b[13] = lcdg[1];
+assign iob3b[12] = lcdg[2];
+assign iob3b[11] = lcdg[3];
+assign iob3b[10] = lcdg[4];
+assign iob3b[9]  = lcdg[5];
+assign iob3b[8]  = lcdg[6];
+assign iob3b[7]  = lcdg[7];
+
+// lcdb
+assign iob3b[6]  = lcdb[0];
+assign iob3b[5]  = lcdb[1];
+assign iob3b[4]  = lcdb[2];
+assign iob3b[3]  = lcdb[3];
+assign iob3b[31] = lcdb[4];
+assign iob3b[30] = lcdb[5];
+assign iob3b[29] = lcdb[6];
+assign iob3b[28] = lcdb[7];
+
+
+//#################
+// Display-Touch-Ctrl.(LCD-Touch: Reset=Low-active)
+assign iob3a[8]  = fpga_clk_rst_n;
+
+//##################
+//LEDs:
+//assign iob4a[16] = led[0];
+//assign iob4a[44] = led[1];
+//assign iob4a[52] = led[5];
+//assign iob4a[17] = led[4];
+//assign iob4a[45] = led[3];
+//assign iob4a[53] = led[2];
 
 endmodule
